@@ -1,0 +1,14 @@
+@import '../../../theme/variables';
+
+:host ::ng-deep {
+  .cards-container {
+    display: flex;
+    @media #{$breakpoint-lt-md} {
+      flex-direction: column;
+    }
+  }
+
+  ion-button {
+    text-transform: none;
+  }
+}

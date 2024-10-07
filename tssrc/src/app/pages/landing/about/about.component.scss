@@ -1,0 +1,14 @@
+@import '../../../../theme/variables';
+
+:host > * {
+  display: block;
+  padding: 50px;
+
+  @media #{$breakpoint-lt-md} {
+    padding: 50px 25px;
+  }
+}
+
+app-stores {
+  text-align: center;
+}

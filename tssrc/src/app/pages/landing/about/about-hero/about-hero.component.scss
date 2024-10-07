@@ -1,0 +1,50 @@
+@import '../../../../../theme/variables';
+
+:host {
+  @media #{$breakpoint-gt-sm} {
+    padding: 200px 50px !important;
+  }
+}
+
+#hero-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 32px;
+
+  align-items: center;
+  margin: auto;
+
+  max-width: 1200px;
+
+  @media #{$breakpoint-lt-md} {
+    grid-auto-flow: row;
+  }
+}
+
+h1 {
+  font-size: 3em;
+
+  @media #{$breakpoint-lt-md} {
+    font-size: 2.5em;
+  }
+
+  @media #{$breakpoint-lt-sm} {
+    font-size: 2em;
+  }
+
+  span {
+    color: var(--ion-color-primary);
+  }
+}
+
+p {
+  font-size: 1.25em;
+  line-height: 1.5em;
+  color: var(--ion-color-dark);
+}
+
+img {
+  width: 100%;
+  border-radius: 16px;
+}
