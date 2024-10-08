@@ -1,5 +1,5 @@
 @if (inputMode$ | async; as inputMode) { @switch (inputMode) { @case ('upload') { @if (videoState$ | async; as
-videoState) { @if (!videoState.src) {
+videoStateModel) { @if (!videoStateModel.src) {
 <app-upload />
 } @else {
 <ng-container *ngTemplateOutlet="translationTemplate"></ng-container>
