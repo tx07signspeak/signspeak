@@ -1,9 +1,0 @@
-.angular
-.firebase
-dist
-coverage
-functions/lib
-tools/cache
-ios/
-android/
-out-tsc/
