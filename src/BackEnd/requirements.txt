@@ -1,0 +1,14 @@
+flask
+flask-socketio
+keras
+langchain_openai
+mediapipe
+neuspell
+opencv-python
+pgvector==0.2.5
+psycopg2-binary
+python-dotenv
+sentence-transformers==2.2.2
+transformers=4.30.2
+tensorflow
+tf-keras
