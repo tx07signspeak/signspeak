@@ -22,7 +22,9 @@ load_dotenv()
 # llm = LLM()
 app = Flask(__name__)
 # recognition = Recognition()
-camera = cv2.VideoCapture(0)
+camera = cv2.VideoCapture(1)
+camera.set(cv2.CAP_PROP_FRAME_WIDTH, 960)
+camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 960)
 socketio = SocketIO(app, cors_allowed_origins="*")
 # embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 # conn = psycopg2.connect(
@@ -56,7 +58,7 @@ def handle_message(msg):
         if camera.isOpened():
             pass
         else:
-            camera = cv2.VideoCapture(0)
+            camera = cv2.VideoCapture(1)
     # socketio.send('Good morning!')
 # def stream():
 #     return Response(recognize(), mimetype="multipart/x-mixed-replace; boundary=frame")
@@ -177,10 +179,12 @@ if __name__ == "__main__":
     # version = cv2.__version__
 
     # # Print the version
-    print("OpenCV version:", version)
+    # print("OpenCV version:", version)
     print("Server is listening on port 1234")
     if camera.isOpened():
         print("Webcam is ready and opened successfully.")
+        ret, image = camera.read()
+        cv2.imshow('Hand Gesture Recognition', image)
     else:
         print("Webcam is not ready.")
     socketio.run(app, debug=False, port=1234)
