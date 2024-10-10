@@ -56,7 +56,7 @@ def handle_message(msg):
         if camera.isOpened():
             pass
         else:
-            camera = cv2.VideoCapture(1)
+            camera = cv2.VideoCapture(0)
     # socketio.send('Good morning!')
 # def stream():
 #     return Response(recognize(), mimetype="multipart/x-mixed-replace; boundary=frame")
