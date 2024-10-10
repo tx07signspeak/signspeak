@@ -48,8 +48,16 @@ def index():
     return render_template('index.html')  # Render an HTML template
 @socketio.on('message')
 def handle_message(msg):
-    print(f'Received message: {msg}') 
-    socketio.send('Good morning!')
+    print(f'Received message: {msg}')
+    if msg.lower() == "quit":
+        camera.release()  # Release the webcam
+        cv2.destroyAllWindows()  # Close the window
+    if msg.lower() == "start":
+        if camera.isOpened():
+            pass
+        else:
+            camera = cv2.VideoCapture(1)
+    # socketio.send('Good morning!')
 # def stream():
 #     return Response(recognize(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
@@ -60,20 +68,19 @@ def handle_message(msg):
 #     while camera.isOpened():
 #         success, image = camera.read()
 #         if not success:
-#             continue
+#             print("web cam is not ready")
 
-#         # image = cv2.flip(image, 1)
 #         image, updated, points = recognition.process(image)
 
-#         image = cv2.resize(image, (image.shape[1] // 2, image.shape[0] // 2))
+#         # image = cv2.resize(image, (image.shape[1] // 2, image.shape[0] // 2))
 
-#         _, buffer = cv2.imencode(".jpg", image)
-#         frame = buffer.tobytes()
+#         # _, buffer = cv2.imencode(".jpg", image)
+#         # frame = buffer.tobytes()
 
 #         if updated:
 #             socketio.emit("R-TRANSCRIPTION", Store.parsed)
 
-#         yield (b"--frame\r\n" b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
+#         # yield (b"--frame\r\n" b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
 #     print("web cam is not ready")
 
 # @socketio.on("connect")
@@ -167,6 +174,10 @@ def handle_message(msg):
 
 if __name__ == "__main__":
     print("Server is listening on port 1234")
+    if camera.isOpened():
+        print("Webcam is ready and opened successfully.")
+    else:
+        print("Webcam is not ready.")
     socketio.run(app, debug=False, port=1234)
     
 
