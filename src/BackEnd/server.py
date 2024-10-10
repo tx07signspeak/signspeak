@@ -22,7 +22,7 @@ load_dotenv()
 # llm = LLM()
 app = Flask(__name__)
 # recognition = Recognition()
-camera = cv2.VideoCapture(1)
+camera = cv2.VideoCapture(0)
 socketio = SocketIO(app, cors_allowed_origins="*")
 # embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 # conn = psycopg2.connect(
