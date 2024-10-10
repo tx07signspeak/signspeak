@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask Socket.IO</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            var socket = io();  // Initialize a new socket connection
+
+            // Send a message when connected
+            socket.on('connect', function() {
+                socket.send('User has connected!');
+            });
+
+            // Display incoming messages
+            socket.on('message', function(msg) {
+                var p = document.createElement('p');
+                p.innerText = msg;
+                document.body.appendChild(p);
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Flask with Socket.IO</h1>
+</body>
+</html>
