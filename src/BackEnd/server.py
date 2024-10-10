@@ -173,6 +173,11 @@ def handle_message(msg):
 
 
 if __name__ == "__main__":
+    # # Get the OpenCV version
+    # version = cv2.__version__
+
+    # # Print the version
+    print("OpenCV version:", version)
     print("Server is listening on port 1234")
     if camera.isOpened():
         print("Webcam is ready and opened successfully.")
