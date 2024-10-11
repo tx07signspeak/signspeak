@@ -22,43 +22,32 @@ load_dotenv()
 # llm = LLM()
 app = Flask(__name__)
 # recognition = Recognition()
-camera = cv2.VideoCapture(1)
-camera.set(cv2.CAP_PROP_FRAME_WIDTH, 960)
-camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 960)
+# camera = cv2.VideoCapture(0)
+# camera.set(cv2.CAP_PROP_FRAME_WIDTH, 960)
+# camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 960)
+# if camera.isOpened():
+#     print("Webcam is ready and opened successfully.")
+#     ret, image = camera.read()
+#     cv2.imshow('Hand Gesture Recognition', image)
+# else:
+#     print("Webcam is not ready.")
 socketio = SocketIO(app, cors_allowed_origins="*")
-# embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-# conn = psycopg2.connect(
-#     database="signs",
-#     host="localhost",
-#     user="postgres",
-#     password=os.getenv("POSTGRES_PASSWORD"),
-#     port=5432,
-# )
-# register_vector(conn)
 
-# Store Fingerspelling Animations
-# alphabet_frames = {}
-# for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-#     file_path = os.path.join("alphabets", f"{letter}.json")
-#     with open(file_path, "r") as file:
-#         alphabet_frames[letter] = json.load(file)
-
-
-# # Stream video feed for iframe
 @app.route("/")
 def index():
-    return render_template('index.html')  # Render an HTML template
+    # return render_template('index.html')  # Render an HTML template
+    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 @socketio.on('message')
 def handle_message(msg):
     print(f'Received message: {msg}')
-    if msg.lower() == "quit":
-        camera.release()  # Release the webcam
-        cv2.destroyAllWindows()  # Close the window
-    if msg.lower() == "start":
-        if camera.isOpened():
-            pass
-        else:
-            camera = cv2.VideoCapture(1)
+    # if msg.lower() == "quit":
+    #     camera.release()  # Release the webcam
+    #     cv2.destroyAllWindows()  # Close the window
+    # if msg.lower() == "start":
+    #     if camera.isOpened():
+    #         pass
+    #     else:
+    #         camera = cv2.VideoCapture(1)
     # socketio.send('Good morning!')
 # def stream():
 #     return Response(recognize(), mimetype="multipart/x-mixed-replace; boundary=frame")
@@ -172,7 +161,21 @@ def handle_message(msg):
 # @socketio.on("disconnect")
 # def on_disconnect():
 #     print("Disconnected from client")
+def generate_frames():
+    cap = cv2.VideoCapture(1)  # Change index if needed
+    while True:
+        success, frame = cap.read()
+        if not success:
+            break
+        else:
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
+@app.route('/video_feed')
+def video_feed():
+    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == "__main__":
     # # Get the OpenCV version
@@ -180,13 +183,13 @@ if __name__ == "__main__":
 
     # # Print the version
     # print("OpenCV version:", version)
-    print("Server is listening on port 1234")
-    if camera.isOpened():
-        print("Webcam is ready and opened successfully.")
-        ret, image = camera.read()
-        cv2.imshow('Hand Gesture Recognition', image)
-    else:
-        print("Webcam is not ready.")
+    # print("Server is listening on port 1234")
+    # if camera.isOpened():
+    #     print("Webcam is ready and opened successfully.")
+    #     ret, image = camera.read()
+    #     cv2.imshow('Hand Gesture Recognition', image)
+    # else:
+    #     print("Webcam is not ready.")
     socketio.run(app, debug=False, port=1234)
     
 
