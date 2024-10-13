@@ -2,6 +2,7 @@
 Estimate hand pose using MediaPipe (Python version).
 # Run
 Here's how to run the demo using your webcam.
+using python version 3.8.20
 ```bash
 python server.py
 ```
