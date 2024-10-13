@@ -1,11 +1,27 @@
-@if (inputMode$ | async; as inputMode) { @switch (inputMode) { @case ('upload') { @if (videoState$ | async; as
+<!-- @if (inputMode$ | async; as inputMode) { @switch (inputMode) { @case ('upload') { @if (videoState$ | async; as
 videoStateModel) { @if (!videoStateModel.src) {
 <app-upload />
 } @else {
 <ng-container *ngTemplateOutlet="translationTemplate"></ng-container>
 } } } @case ('webcam') {
 <ng-container *ngTemplateOutlet="translationTemplate"></ng-container>
-} } }
+} } } -->
+
+<ng-container *ngIf="inputMode$ | async as inputMode">
+  <ng-container [ngSwitch] = "inputMode">
+    <ng-container *ngSwitchCase="'upload'">
+      <ng-container *ngIf="videoState$ | async as videoState">
+        <ng-container *ngIf="!videoState.src; else translationTemplate">
+          <app-upload></app-upload>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+    <ng-container *ngSwitchCase="'webcam'">
+      <ng-container *ngTemplateOutlet="translationTemplate">
+      </ng-container>
+    </ng-container>
+  </ng-container>
+</ng-container>
 
 <ng-template #translationTemplate>
   <div class="interface">
