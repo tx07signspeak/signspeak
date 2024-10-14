@@ -16,37 +16,23 @@ from model import PointHistoryClassifier
 from dotenv import load_dotenv
 from flask import Flask, Response, render_template
 from flask_socketio import SocketIO, emit, send
-# from pgvector.psycopg2 import register_vector
-# from sentence_transformers import SentenceTransformer
-
-# from utils.llm import LLM
-# from utils.store import Store
-# from utils.recognition import Recognition
 
 # Configuration
 load_dotenv()
-# log = logging.getLogger("werkzeug")
-# log.setLevel(logging.ERROR)
 
 # Initialization
-# llm = LLM()
 app = Flask(__name__)
-# recognition = Recognition()
-# camera = cv2.VideoCapture(0)
-# camera.set(cv2.CAP_PROP_FRAME_WIDTH, 960)
-# camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 960)
-# if camera.isOpened():
-#     print("Webcam is ready and opened successfully.")
-#     ret, image = camera.read()
-#     cv2.imshow('Hand Gesture Recognition', image)
-# else:
-#     print("Webcam is not ready.")
+
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.route("/")
 def index():
-    # return render_template('index.html')  # Render an HTML template
+    return render_template('index.html')  # Render an HTML template
+
+@app.route('/video_feed')
+def video_feed():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
 @socketio.on('message')
 def handle_message(msg):
     print(f'Received message: {msg}')
@@ -62,113 +48,7 @@ def handle_message(msg):
 # def stream():
 #     return Response(recognize(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
-
-# def recognize():
-#     """Recognizes ASL fingerpselling within video stream"""
-
-#     while camera.isOpened():
-#         success, image = camera.read()
-#         if not success:
-#             print("web cam is not ready")
-
-#         image, updated, points = recognition.process(image)
-
-#         # image = cv2.resize(image, (image.shape[1] // 2, image.shape[0] // 2))
-
-#         # _, buffer = cv2.imencode(".jpg", image)
-#         # frame = buffer.tobytes()
-
-#         if updated:
-#             socketio.emit("R-TRANSCRIPTION", Store.parsed)
-
-#         # yield (b"--frame\r\n" b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
-#     print("web cam is not ready")
-
-# @socketio.on("connect")
-# def on_connect():
-#     """Triggered when client-server SocketIO connection is established"""
-
-#     print("Connected to client")
-#     emit("R-TRANSCRIPTION", Store.parsed)
-
-    # # Send hello sign
-    # cursor = conn.cursor()
-    # animations = []
-    # embedding = embedding_model.encode("hello")
-    # cursor.execute(
-    #     "SELECT word, points, (embedding <=> %s) AS cosine_similarity FROM signs ORDER BY cosine_similarity ASC LIMIT 1",
-    #     (embedding,),
-    # )
-    # result = cursor.fetchone()
-    # if result and 1 - result[2] > 0.70:
-    #     animations.append(("hello", result[1]))
-
-    # emit("E-ANIMATION", animations)
-
-    # cursor.close()
-
-
-# @socketio.on("R-CLEAR-TRANSCRIPTION")
-# def on_clear_transcription():
-#     """Triggered when client requests to clear the receptive transcription"""
-
-#     Store.reset()
-#     emit("R-TRANSCRIPTION", Store.parsed)
-#     # log.log(logging.INFO, "STORE RESET")
-
-
-# @socketio.on("E-REQUEST-ANIMATION")
-# def on_request_animation(words: str):
-#     """Triggered when client requests an expressive animation for a word or sentence"""
-
-#     animations = []
-#     words = words.strip()
-
-#     if not words:
-#         return
-
-#     # Gloss the words
-#     words = llm.gloss(words)
-#     # words = words.split()
-
-#     cursor = conn.cursor()
-#     for word in words:
-#         word = word.strip()
-#         if not word:
-#             continue
-
-#         embedding = embedding_model.encode(word)
-#         cursor.execute(
-#             "SELECT word, points, (embedding <=> %s) AS cosine_similarity FROM signs ORDER BY cosine_similarity ASC LIMIT 1",
-#             (embedding,),
-#         )
-#         result = cursor.fetchone()
-
-#         # Add sign to animation
-#         if result and 1 - result[2] > 0.70:
-#             animations.append((word, result[1]))
-#         else:  # Add fingerspell to animation
-#             animation = []
-#             for letter in word:
-#                 animation.extend(alphabet_frames.get(letter.upper(), []))
-
-#             for i in range(len(animation)):
-#                 animation[i][0] = i
-#             animations.append((f"fs-{word.upper()}", animation))
-
-#         if "." in word:
-#             space = []
-#             last_frame = animations[-1][1][-1]
-#             for i in range(50):
-#                 space.append(last_frame)
-#                 space[-1][0] = i
-#             animations.append(("", space))
-
-#     emit("E-ANIMATION", animations)
-#     cursor.close()
-
-
-# @socketio.on("disconnect")
+@socketio.on("disconnect")
 # def on_disconnect():
 #     print("Disconnected from client")
 def generate_frames():
@@ -196,7 +76,7 @@ def generate_frames():
     use_brect = True
 
     # Camera preparation ###############################################################
-    camera = cv.VideoCapture(1)
+    camera = cv.VideoCapture(cap_device)
     camera.set(cv.CAP_PROP_FRAME_WIDTH, cap_width)
     camera.set(cv.CAP_PROP_FRAME_HEIGHT, cap_height)
     if camera.isOpened():
@@ -317,6 +197,9 @@ def generate_frames():
                     keypoint_classifier_labels[hand_sign_id],
                     point_history_classifier_labels[most_common_fg_id[0][0]],
                 )
+                print('Text: ' + keypoint_classifier_labels[hand_sign_id])
+                print('Gesture Text: ' + point_history_classifier_labels[most_common_fg_id[0][0]])
+                socketio.send(keypoint_classifier_labels[hand_sign_id])
         else:
             point_history.append([0, 0])
 
@@ -331,10 +214,6 @@ def generate_frames():
 
     camera.release()
     cv.destroyAllWindows()
-
-@app.route('/video_feed')
-def video_feed():
-    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 def get_args():
     parser = argparse.ArgumentParser()
