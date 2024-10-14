@@ -1,7 +1,8 @@
 # hand-gesture-recognition-using-mediapipe
 Estimate hand pose using MediaPipe (Python version).
 # Run
-Here's how to run the demo using your webcam. 0 or 1 depends on your pc
+Here's how to run the demo using your webcam.
+using python version 3.8.20
 ```bash
 python server.py --device 1
 ```
