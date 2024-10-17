@@ -200,7 +200,7 @@ def generate_frames():
                     point_history_classifier_labels[most_common_fg_id[0][0]],
                 )
                 print('Text: ' + keypoint_classifier_labels[hand_sign_id])
-                print('Gesture Text: ' + point_history_classifier_labels[most_common_fg_id[0][0]])
+                # print('Gesture Text: ' + point_history_classifier_labels[most_common_fg_id[0][0]])
                 socketio.send(keypoint_classifier_labels[hand_sign_id])
         else:
             point_history.append([0, 0])
