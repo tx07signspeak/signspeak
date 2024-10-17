@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, OnDestroy, Injectable} from '@angular/core';
 import {Store} from '@ngxs/store';
 import {VideoStateModel} from '../../../core/modules/ngxs/store/video/video.state';
 import {InputMode, SignWritingObj} from '../../../modules/translate/translate.state';
@@ -8,6 +8,7 @@ import {
   SetSpokenLanguageText,
 } from '../../../modules/translate/translate.actions';
 import {Observable} from 'rxjs';
+import {io} from 'socket.io-client';
 
 const FAKE_WORDS = [
   {
@@ -80,19 +81,32 @@ const FAKE_WORDS = [
   templateUrl: './signed-to-spoken.component.html',
   styleUrls: ['./signed-to-spoken.component.scss'],
 })
-export class SignedToSpokenComponent implements OnInit {
+@Injectable()
+export class SignedToSpokenComponent implements OnInit, OnDestroy {
   videoState$!: Observable<VideoStateModel>;
   inputMode$!: Observable<InputMode>;
   spokenLanguage$!: Observable<string>;
   spokenLanguageText$!: Observable<string>;
+  private socket: any;
+  private Words: string = '';
 
   constructor(private store: Store) {
     this.videoState$ = this.store.select<VideoStateModel>(state => state.video);
     this.inputMode$ = this.store.select<InputMode>(state => state.translate.inputMode);
     this.spokenLanguage$ = this.store.select<string>(state => state.translate.spokenLanguage);
     this.spokenLanguageText$ = this.store.select<string>(state => state.translate.spokenLanguageText);
-
     this.store.dispatch(new SetSpokenLanguageText(''));
+    this.socket = io('http://localhost:1234');
+    this.socket.on('connect', () => {
+      console.log('Socket.IO connection opened');
+      this.socket.emit('message', 'Hello from client');
+    });
+    this.socket.on('disconnect', () => {
+      console.log('Socket.IO connection closed');
+    });
+    this.socket.on('message', (data: string) => {
+      this.Words = data;
+    });
   }
 
   ngOnInit(): void {
@@ -105,12 +119,13 @@ export class SignedToSpokenComponent implements OnInit {
       if (video) {
         let resultArray = [];
         let resultText = '';
-        for (const step of FAKE_WORDS) {
-          if (step.time <= video.currentTime) {
-            resultText = step.text;
-            resultArray = step.sw;
-          }
-        }
+        // for (const step of FAKE_WORDS) {
+        //   if (step.time <= video.currentTime) {
+        //     resultText = step.text;
+        //     resultArray = step.sw;
+        //   }
+        // }
+        resultText = this.Words;
 
         if (resultText !== lastText) {
           this.store.dispatch(new SetSpokenLanguageText(resultText));
@@ -128,6 +143,9 @@ export class SignedToSpokenComponent implements OnInit {
     f();
   }
 
+  ngOnDestroy(): void {
+    this.socket.disconnect();
+  }
   copyTranslation() {
     this.store.dispatch(CopySpokenLanguageText);
   }

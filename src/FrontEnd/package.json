@@ -99,6 +99,7 @@
     "ngx-filesize": "3.0.4",
     "pose-viewer": "0.10.0",
     "rxjs": "7.8.1",
+    "socket.io-client": "^4.8.0",
     "stats.js": "0.17.0",
     "three": "0.169.0",
     "tslib": "2.7.0",
