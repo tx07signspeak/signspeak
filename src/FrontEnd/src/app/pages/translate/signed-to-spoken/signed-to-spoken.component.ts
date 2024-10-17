@@ -106,6 +106,7 @@ export class SignedToSpokenComponent implements OnInit, OnDestroy {
     });
     this.socket.on('message', (data: string) => {
       this.Words = data;
+      console.log('message from server: ', data);
     });
   }
 
