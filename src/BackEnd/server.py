@@ -14,7 +14,7 @@ from utils.cvfpscalc import CvFpsCalc
 from model import KeyPointClassifier
 from model import PointHistoryClassifier
 from dotenv import load_dotenv
-from flask import Flask, Response, render_template
+from flask import Flask, Response, render_template, request
 from flask_socketio import SocketIO, emit, send
 import utils.functions as uf
 import time
@@ -51,7 +51,8 @@ def handle_message(msg):
 #     return Response(recognize(), mimetype="multipart/x-mixed-replace; boundary=frame")
 @socketio.on("disconnect")
 def on_disconnect():
-    print("Disconnected from client")
+    client_id = request.sid
+    print(f'Client disconnected with SID: {client_id}')
     
 def generate_frames():
     # camera = cv.VideoCapture(1)  # Change index if needed
@@ -219,18 +220,19 @@ def generate_frames():
 @socketio.on('video-frame')
 def handle_video_frame(data):
     # Decode the Base64-encoded frame data
-    print('data from client')
+    client_id = request.sid
+    print(f'Data from {client_id}')
     image = base64_to_image(data)
     # yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
     # Process the frame as needed
     # ...
     # Example processing (convert to grayscale)
-    # gray_image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+    gray_image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
     
-    # # Encode processed image back to base64
-    # _, buffer = cv.imencode('.jpg', gray_image)
-    # encoded_image = base64.b64encode(buffer).decode('utf-8')
-    # socketio.emit('display-frame', f"data:image/jpeg;base64,{encoded_image}")
+    # Encode processed image back to base64
+    _, buffer = cv.imencode('.jpg', gray_image)
+    encoded_image = base64.b64encode(buffer).decode('utf-8')
+    socketio.emit('display-frame', f"data:image/jpeg;base64,{encoded_image}")
     
 def base64_to_image(base64_string):
     # Extract the base64 encoded binary data from the input string
@@ -241,10 +243,10 @@ def base64_to_image(base64_string):
     image_array = np.frombuffer(image_bytes, dtype=np.uint8)
     # Decode the numpy array as an image using OpenCV
     image = cv.imdecode(image_array, cv.IMREAD_COLOR)
-    filename = os.path.join(f'image_{int(time.time())}.jpg')
+    # filename = os.path.join(f'image_{int(time.time())}.jpg')
 
     # Save the image
-    cv.imwrite(filename, image)
+    # cv.imwrite(filename, image)
     return image  
   
 @app.route('/stream')

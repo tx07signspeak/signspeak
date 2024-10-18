@@ -10,12 +10,13 @@
 
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script>
-        const socket = io(''); // Adjust the URL as needed
+        const socket = io('http://localhost:1234'); // Adjust the URL as needed
 
         // Listen for 'display-frame' event from the server
         socket.on('display-frame', (data) => {
             const imgElement = document.getElementById('videoFrame');
             imgElement.src = data; // Set the image source to the received frame data
+            console.log('Received frame data');
         });
     </script>
 </body>
