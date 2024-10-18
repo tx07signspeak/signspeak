@@ -9,7 +9,7 @@ from collections import deque
 import numpy as np
 import argparse
 import mediapipe as mp
-
+import base64
 from utils.cvfpscalc import CvFpsCalc
 from model import KeyPointClassifier
 from model import PointHistoryClassifier
@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 from flask import Flask, Response, render_template
 from flask_socketio import SocketIO, emit, send
 import utils.functions as uf
+import time
 
 # Configuration
 load_dotenv()
@@ -48,7 +49,6 @@ def handle_message(msg):
     # socketio.send('Good morning!')
 # def stream():
 #     return Response(recognize(), mimetype="multipart/x-mixed-replace; boundary=frame")
-
 @socketio.on("disconnect")
 def on_disconnect():
     print("Disconnected from client")
@@ -216,7 +216,40 @@ def generate_frames():
 
     camera.release()
     cv.destroyAllWindows()
+@socketio.on('video-frame')
+def handle_video_frame(data):
+    # Decode the Base64-encoded frame data
+    print('data from client')
+    image = base64_to_image(data)
+    # yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+    # Process the frame as needed
+    # ...
+    # Example processing (convert to grayscale)
+    # gray_image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+    
+    # # Encode processed image back to base64
+    # _, buffer = cv.imencode('.jpg', gray_image)
+    # encoded_image = base64.b64encode(buffer).decode('utf-8')
+    # socketio.emit('display-frame', f"data:image/jpeg;base64,{encoded_image}")
+    
+def base64_to_image(base64_string):
+    # Extract the base64 encoded binary data from the input string
+    base64_data = base64_string.split(",")[1]
+    # Decode the base64 data to bytes
+    image_bytes = base64.b64decode(base64_data)
+    # Convert the bytes to numpy array
+    image_array = np.frombuffer(image_bytes, dtype=np.uint8)
+    # Decode the numpy array as an image using OpenCV
+    image = cv.imdecode(image_array, cv.IMREAD_COLOR)
+    filename = os.path.join(f'image_{int(time.time())}.jpg')
 
+    # Save the image
+    cv.imwrite(filename, image)
+    return image  
+  
+@app.route('/stream')
+def stream():
+    return render_template('stream.html')
 if __name__ == "__main__":
     # # Get the OpenCV version
     # version = cv2.__version__
