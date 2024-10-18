@@ -96,7 +96,13 @@ export class SignedToSpokenComponent implements OnInit, OnDestroy {
     this.spokenLanguage$ = this.store.select<string>(state => state.translate.spokenLanguage);
     this.spokenLanguageText$ = this.store.select<string>(state => state.translate.spokenLanguageText);
     this.store.dispatch(new SetSpokenLanguageText(''));
-    this.socket = io('http://localhost:1234');
+    this.socket = io('http://localhost:1234', {
+      reconnection: true, // Enable reconnection
+      reconnectionAttempts: 5, // Number of attempts before giving up
+      reconnectionDelay: 1000, // Initial delay between attempts (1 second)
+      reconnectionDelayMax: 5000, // Maximum delay between attempts (5 seconds)
+      randomizationFactor: 0.5, // Randomization factor for delay
+    });
     this.socket.on('connect', () => {
       console.log('Socket.IO connection opened');
       this.socket.emit('message', 'Hello from client');
