@@ -88,7 +88,7 @@ export class SignedToSpokenComponent implements OnInit, OnDestroy {
   spokenLanguage$!: Observable<string>;
   spokenLanguageText$!: Observable<string>;
   private socket: any;
-  private Words: string = '';
+  private lastText: string = '';
 
   constructor(private store: Store) {
     this.videoState$ = this.store.select<VideoStateModel>(state => state.video);
@@ -111,8 +111,11 @@ export class SignedToSpokenComponent implements OnInit, OnDestroy {
       console.log('Socket.IO connection closed');
     });
     this.socket.on('message', (data: string) => {
-      this.Words = data;
-      console.log('message from server: ', data);
+      if (data !== this.lastText) {
+        this.store.dispatch(new SetSpokenLanguageText(data));
+        this.lastText = data;
+        console.log('message from server: ', data);
+      }
     });
   }
 
@@ -120,7 +123,7 @@ export class SignedToSpokenComponent implements OnInit, OnDestroy {
     // To get the fake translation
     let lastArray = [];
     let lastText = '';
-    
+
     const f = () => {
       const video = document.querySelector('video');
       if (video) {
@@ -147,6 +150,7 @@ export class SignedToSpokenComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     // this.socket.disconnect();
+    this.store.dispatch(new SetSpokenLanguageText('Disconnected from server'));
   }
   copyTranslation() {
     this.store.dispatch(CopySpokenLanguageText);
