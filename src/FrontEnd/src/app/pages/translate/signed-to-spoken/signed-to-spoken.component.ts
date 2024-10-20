@@ -109,6 +109,9 @@ export class SignedToSpokenComponent implements OnInit, OnDestroy {
     });
     this.socket.on('disconnect', () => {
       console.log('Socket.IO connection closed');
+      setTimeout(() => {
+        this.socket.connect();
+      }, 100); // Reconnect
     });
     this.socket.on('message', (data: string) => {
       if (data !== this.lastText) {
@@ -127,27 +130,57 @@ export class SignedToSpokenComponent implements OnInit, OnDestroy {
     const f = () => {
       const video = document.querySelector('video');
       if (video) {
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        video.addEventListener('play', () => {
-          // Send video frame to Python server
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          context.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const frameData = canvas.toDataURL('image/jpeg');
-          // this.socket.emit('video-frame', frameData);
-          // Emit every 100 milliseconds
-          setInterval(() => {
-            this.socket.emit('video-frame', frameData);
-          }, 1000);
-          // console.log('send back data');
-        });
+        let resultArray = [];
+        let resultText = '';
+        for (const step of FAKE_WORDS) {
+          if (step.time <= video.currentTime) {
+            resultText = step.text;
+            resultArray = step.sw;
+          }
+        }
+
+        if (resultText !== lastText) {
+          this.store.dispatch(new SetSpokenLanguageText(resultText));
+          lastText = resultText;
+        }
+
+        if (JSON.stringify(resultArray) !== JSON.stringify(lastArray)) {
+          this.store.dispatch(new SetSignWritingText(resultArray));
+          lastArray = resultArray;
+        }
       }
+
       requestAnimationFrame(f);
     };
     f();
   }
 
+  // async captureFrames(videoElement: HTMLVideoElement) {
+  //   const canvas = document.createElement('canvas');
+  //   const context = canvas.getContext('2d', {alpha: false});
+  //   let lastFrameTime = 0;
+  //   const targetFPS = 1; // Adjust this value to balance performance and quality
+
+  //   canvas.width = videoElement.videoWidth;
+  //   canvas.height = videoElement.videoHeight;
+
+  //   const captureLoop = (timestamp: number) => {
+  //     if (timestamp - lastFrameTime >= 1000 ) {
+  //       if (this.socket.connected) {
+  //         context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+  //         const frameData = canvas.toDataURL('image/jpeg', 0.8); // Adjust quality as needed
+  //         this.socket.emit('video-frame', frameData);
+  //         lastFrameTime = timestamp;
+  //       } else {
+  //         console.log('Socket disconnected. Attempting to reconnect...');
+  //         this.socket.connect();
+  //       }
+  //     }
+  //     requestAnimationFrame(captureLoop);
+  //   };
+
+  //   requestAnimationFrame(captureLoop);
+  // }
   ngOnDestroy(): void {
     // this.socket.disconnect();
     this.store.dispatch(new SetSpokenLanguageText('Disconnected from server'));
