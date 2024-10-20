@@ -129,27 +129,27 @@ export class SignedToSpokenComponent implements OnInit, OnDestroy {
 
     const f = () => {
       const video = document.querySelector('video');
-      if (video) {
-        let resultArray = [];
-        let resultText = '';
-        for (const step of FAKE_WORDS) {
-          if (step.time <= video.currentTime) {
-            resultText = step.text;
-            resultArray = step.sw;
-          }
-        }
+      // if (video) {
+      //   let resultArray = [];
+      //   let resultText = '';
+      //   for (const step of FAKE_WORDS) {
+      //     if (step.time <= video.currentTime) {
+      //       resultText = step.text;
+      //       resultArray = step.sw;
+      //     }
+      //   }
 
-        if (resultText !== lastText) {
-          this.store.dispatch(new SetSpokenLanguageText(resultText));
-          lastText = resultText;
-        }
+      //   if (resultText !== lastText) {
+      //     this.store.dispatch(new SetSpokenLanguageText(resultText));
+      //     lastText = resultText;
+      //   }
 
-        if (JSON.stringify(resultArray) !== JSON.stringify(lastArray)) {
-          this.store.dispatch(new SetSignWritingText(resultArray));
-          lastArray = resultArray;
-        }
-      }
-
+      //   if (JSON.stringify(resultArray) !== JSON.stringify(lastArray)) {
+      //     this.store.dispatch(new SetSignWritingText(resultArray));
+      //     lastArray = resultArray;
+      //   }
+      // }
+      video.src = 'http://127.0.0.1:1234/video_feed';
       requestAnimationFrame(f);
     };
     f();
