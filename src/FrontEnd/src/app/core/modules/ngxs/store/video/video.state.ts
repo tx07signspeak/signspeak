@@ -15,11 +15,16 @@ export interface VideoSettings {
   width: number;
 }
 
+export class VideoReady {
+  static readonly type = '[Video] Ready';
+}
+
 export interface VideoStateModel {
   camera: MediaStream;
   src: string | null;
   videoSettings: VideoSettings;
   error: string;
+  videoElement: HTMLVideoElement | null;
 }
 
 const initialState: VideoStateModel = {
@@ -27,6 +32,7 @@ const initialState: VideoStateModel = {
   src: null,
   videoSettings: null,
   error: null,
+  videoElement: null,
 };
 
 @Injectable()
@@ -66,38 +72,69 @@ export class VideoState implements NgxsOnInit {
 
   @Action(StartCamera)
   async startCamera(context: StateContext<VideoStateModel>): Promise<void> {
-    // const {patchState, dispatch} = context;
+    const {patchState, dispatch} = context;
 
-    // patchState({error: 'starting'});
-    // this.stopVideo(context);
+    patchState({error: 'starting'});
+    this.stopVideo(context);
 
-    // const turnOffVideo = () => dispatch(new SetSetting('receiveVideo', false));
+    const turnOffVideo = () => dispatch(new SetSetting('receiveVideo', false));
 
-    // try {
-    //   const camera = await this.navigator.getCamera({
-    //     facingMode: 'user',
-    //     aspectRatio: 1,
-    //     width: {min: 1280},
-    //     height: {min: 720},
-    //     frameRate: 120, // Used to minimize motion blur
-    //   });
+    try {
+      const camera = await this.navigator.getCamera({
+        facingMode: 'user',
+        aspectRatio: 1,
+        width: {min: 1280},
+        height: {min: 720},
+        frameRate: 120, // Used to minimize motion blur
+      });
 
-    //   const videoTrack = camera.getVideoTracks()[0];
-    //   const trackSettings = videoTrack.getSettings();
-    //   const videoSettings: VideoSettings = {
-    //     aspectRatio: VideoState.aspectRatio(trackSettings.aspectRatio),
-    //     frameRate: trackSettings.frameRate,
-    //     width: trackSettings.width,
-    //     height: trackSettings.height,
-    //   };
-    //   videoTrack.addEventListener('ended', turnOffVideo);
+      const videoTrack = camera.getVideoTracks()[0];
+      const trackSettings = videoTrack.getSettings();
+      const videoSettings: VideoSettings = {
+        aspectRatio: VideoState.aspectRatio(trackSettings.aspectRatio),
+        frameRate: trackSettings.frameRate,
+        width: trackSettings.width,
+        height: trackSettings.height,
+      };
+      videoTrack.addEventListener('ended', turnOffVideo);
 
-    //   patchState({camera, videoSettings, error: null});
-    // } catch (e) {
-    //   patchState({error: e.message});
-    //   turnOffVideo();
-    // }
+      patchState({camera, videoSettings, error: null});
+    } catch (e) {
+      patchState({error: e.message});
+      turnOffVideo();
+    }
   }
+  // @Action(StartCamera)
+  // async startCamera(context: StateContext<VideoStateModel>): Promise<void> {
+  //   const {patchState, dispatch} = context;
+
+  //   patchState({error: 'starting'});
+  //   this.stopVideo(context);
+
+  //   const turnOffVideo = () => dispatch(new SetSetting('receiveVideo', false));
+
+  //   try {
+  //     // Create a video element without accessing the camera
+  //     const videoElement = document.createElement('video');
+  //     videoElement.autoplay = true;
+
+  //     // Set up dummy video settings
+  //     const videoSettings: VideoSettings = {
+  //       aspectRatio: '16-9',
+  //       frameRate: 30,
+  //       width: 1280,
+  //       height: 720,
+  //     };
+
+  //     patchState({videoSettings, error: null, videoElement});
+
+  //     // Dispatch an action to indicate that the video is ready
+  //     dispatch(new VideoReady());
+  //   } catch (e) {
+  //     patchState({error: e.message});
+  //     turnOffVideo();
+  //   }
+  // }
 
   @Action(SetVideo)
   async setVideo(context: StateContext<VideoStateModel>, {src}: SetVideo): Promise<void> {
