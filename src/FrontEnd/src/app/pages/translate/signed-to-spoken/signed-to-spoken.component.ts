@@ -183,7 +183,7 @@ export class SignedToSpokenComponent implements OnInit, OnDestroy {
   // }
   ngOnDestroy(): void {
     // this.socket.disconnect();
-    this.store.dispatch(new SetSpokenLanguageText('Disconnected from server'));
+    // this.store.dispatch(new SetSpokenLanguageText('Disconnected from server'));
   }
   copyTranslation() {
     this.store.dispatch(CopySpokenLanguageText);
