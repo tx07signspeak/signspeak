@@ -15,11 +15,16 @@ export interface VideoSettings {
   width: number;
 }
 
+export class VideoReady {
+  static readonly type = '[Video] Ready';
+}
+
 export interface VideoStateModel {
   camera: MediaStream;
   src: string | null;
   videoSettings: VideoSettings;
   error: string;
+  videoElement: HTMLVideoElement | null;
 }
 
 const initialState: VideoStateModel = {
@@ -27,6 +32,7 @@ const initialState: VideoStateModel = {
   src: null,
   videoSettings: null,
   error: null,
+  videoElement: null,
 };
 
 @Injectable()
@@ -98,6 +104,37 @@ export class VideoState implements NgxsOnInit {
       turnOffVideo();
     }
   }
+  // @Action(StartCamera)
+  // async startCamera(context: StateContext<VideoStateModel>): Promise<void> {
+  //   const {patchState, dispatch} = context;
+
+  //   patchState({error: 'starting'});
+  //   this.stopVideo(context);
+
+  //   const turnOffVideo = () => dispatch(new SetSetting('receiveVideo', false));
+
+  //   try {
+  //     // Create a video element without accessing the camera
+  //     const videoElement = document.createElement('video');
+  //     videoElement.autoplay = true;
+
+  //     // Set up dummy video settings
+  //     const videoSettings: VideoSettings = {
+  //       aspectRatio: '16-9',
+  //       frameRate: 30,
+  //       width: 1280,
+  //       height: 720,
+  //     };
+
+  //     patchState({videoSettings, error: null, videoElement});
+
+  //     // Dispatch an action to indicate that the video is ready
+  //     dispatch(new VideoReady());
+  //   } catch (e) {
+  //     patchState({error: e.message});
+  //     turnOffVideo();
+  //   }
+  // }
 
   @Action(SetVideo)
   async setVideo(context: StateContext<VideoStateModel>, {src}: SetVideo): Promise<void> {

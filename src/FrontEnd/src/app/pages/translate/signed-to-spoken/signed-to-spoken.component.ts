@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, OnDestroy, Injectable} from '@angular/core';
 import {Store} from '@ngxs/store';
 import {VideoStateModel} from '../../../core/modules/ngxs/store/video/video.state';
 import {InputMode, SignWritingObj} from '../../../modules/translate/translate.state';
@@ -8,6 +8,7 @@ import {
   SetSpokenLanguageText,
 } from '../../../modules/translate/translate.actions';
 import {Observable} from 'rxjs';
+import {io} from 'socket.io-client';
 
 const FAKE_WORDS = [
   {
@@ -80,19 +81,45 @@ const FAKE_WORDS = [
   templateUrl: './signed-to-spoken.component.html',
   styleUrls: ['./signed-to-spoken.component.scss'],
 })
-export class SignedToSpokenComponent implements OnInit {
+@Injectable()
+export class SignedToSpokenComponent implements OnInit, OnDestroy {
   videoState$!: Observable<VideoStateModel>;
   inputMode$!: Observable<InputMode>;
   spokenLanguage$!: Observable<string>;
   spokenLanguageText$!: Observable<string>;
+  private socket: any;
+  private lastText: string = '';
 
   constructor(private store: Store) {
     this.videoState$ = this.store.select<VideoStateModel>(state => state.video);
     this.inputMode$ = this.store.select<InputMode>(state => state.translate.inputMode);
     this.spokenLanguage$ = this.store.select<string>(state => state.translate.spokenLanguage);
     this.spokenLanguageText$ = this.store.select<string>(state => state.translate.spokenLanguageText);
-
     this.store.dispatch(new SetSpokenLanguageText(''));
+    this.socket = io('http://localhost:1234', {
+      reconnection: true, // Enable reconnection
+      reconnectionAttempts: 5, // Number of attempts before giving up
+      reconnectionDelay: 1000, // Initial delay between attempts (1 second)
+      reconnectionDelayMax: 5000, // Maximum delay between attempts (5 seconds)
+      randomizationFactor: 0.5, // Randomization factor for delay
+    });
+    this.socket.on('connect', () => {
+      console.log('Socket.IO connection opened');
+      this.socket.emit('message', 'Hello from client');
+    });
+    this.socket.on('disconnect', () => {
+      console.log('Socket.IO connection closed');
+      setTimeout(() => {
+        this.socket.connect();
+      }, 100); // Reconnect
+    });
+    this.socket.on('message', (data: string) => {
+      if (data !== this.lastText) {
+        this.store.dispatch(new SetSpokenLanguageText(data));
+        this.lastText = data;
+        console.log('message from server: ', data);
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -102,32 +129,62 @@ export class SignedToSpokenComponent implements OnInit {
 
     const f = () => {
       const video = document.querySelector('video');
-      if (video) {
-        let resultArray = [];
-        let resultText = '';
-        for (const step of FAKE_WORDS) {
-          if (step.time <= video.currentTime) {
-            resultText = step.text;
-            resultArray = step.sw;
-          }
-        }
+      // if (video) {
+      //   let resultArray = [];
+      //   let resultText = '';
+      //   for (const step of FAKE_WORDS) {
+      //     if (step.time <= video.currentTime) {
+      //       resultText = step.text;
+      //       resultArray = step.sw;
+      //     }
+      //   }
 
-        if (resultText !== lastText) {
-          this.store.dispatch(new SetSpokenLanguageText(resultText));
-          lastText = resultText;
-        }
+      //   if (resultText !== lastText) {
+      //     this.store.dispatch(new SetSpokenLanguageText(resultText));
+      //     lastText = resultText;
+      //   }
 
-        if (JSON.stringify(resultArray) !== JSON.stringify(lastArray)) {
-          this.store.dispatch(new SetSignWritingText(resultArray));
-          lastArray = resultArray;
-        }
-      }
-
+      //   if (JSON.stringify(resultArray) !== JSON.stringify(lastArray)) {
+      //     this.store.dispatch(new SetSignWritingText(resultArray));
+      //     lastArray = resultArray;
+      //   }
+      // }
+      video.src = 'http://127.0.0.1:1234/video_feed';
       requestAnimationFrame(f);
     };
     f();
   }
 
+  // async captureFrames(videoElement: HTMLVideoElement) {
+  //   const canvas = document.createElement('canvas');
+  //   const context = canvas.getContext('2d', {alpha: false});
+  //   let lastFrameTime = 0;
+  //   const targetFPS = 1; // Adjust this value to balance performance and quality
+
+  //   canvas.width = videoElement.videoWidth;
+  //   canvas.height = videoElement.videoHeight;
+
+  //   const captureLoop = (timestamp: number) => {
+  //     if (timestamp - lastFrameTime >= 1000 ) {
+  //       if (this.socket.connected) {
+  //         context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+  //         const frameData = canvas.toDataURL('image/jpeg', 0.8); // Adjust quality as needed
+  //         this.socket.emit('video-frame', frameData);
+  //         lastFrameTime = timestamp;
+  //       } else {
+  //         console.log('Socket disconnected. Attempting to reconnect...');
+  //         this.socket.connect();
+  //       }
+  //     }
+  //     requestAnimationFrame(captureLoop);
+  //   };
+
+  //   requestAnimationFrame(captureLoop);
+  // }
+  ngOnDestroy(): void {
+    // this.socket.disconnect();
+    // this.store.dispatch(new SetSpokenLanguageText('Disconnected from server'));
+  }
   copyTranslation() {
     this.store.dispatch(CopySpokenLanguageText);
   }

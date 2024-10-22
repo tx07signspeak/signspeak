@@ -79,7 +79,7 @@ export class VideoComponent extends BaseComponent implements AfterViewInit {
   }
 
   async appLoop(): Promise<void> {
-    // const fps = this.store.snapshot().video.videoSettings.frameRate;
+    const fps = this.store.snapshot().video.videoSettings.frameRate;
     const video = this.videoEl.nativeElement;
     const poseAction = new PoseVideoFrame(this.videoEl.nativeElement);
 

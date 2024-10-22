@@ -129,7 +129,7 @@ export class TranslateState implements NgxsOnInit {
       if (signedLanguageVideo) {
         dispatch([new SetInputMode('upload'), new SetVideo(signedLanguageVideo)]);
       } else {
-        dispatch(new SetInputMode('webcam'));
+         dispatch(new SetInputMode('webcam'));
       }
     } else {
       dispatch(new SetInputMode('text'));
@@ -151,7 +151,7 @@ export class TranslateState implements NgxsOnInit {
     dispatch([StopVideo, ChangeTranslation]);
 
     if (mode === 'webcam') {
-      dispatch(StartCamera);
+        dispatch(StartCamera);
     }
   }
 
