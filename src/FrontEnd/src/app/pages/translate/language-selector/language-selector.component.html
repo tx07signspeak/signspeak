@@ -45,14 +45,15 @@
     fill="clear">
     @if (language) { @if (flags) {
     <app-flag-icon [country]="langCountries[language]" [squared]="true"></app-flag-icon>
+    <span class="wrap-text" style="color:rgba(0, 0, 0, 0.648)">ASL</span>
     }
-    <span class="wrap-text">{{ langNames[language] }}</span>
-    } @else {
-    {{ t('detect') }}
+    @else {
+      <span class="wrap-text" style="color:rgba(0, 0, 0, 0.648)">Text/Voice</span>
+    }} @else {
+    Text/Voice
     }
   </ion-button>
   }
-
   <!-- Expand icon for large screens -->
   <ion-button
     fill="clear"

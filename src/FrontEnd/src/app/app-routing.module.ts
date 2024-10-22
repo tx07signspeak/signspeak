@@ -16,7 +16,7 @@ const routes: Routes = [
   {path: 'about', loadChildren: () => import('./pages/landing/landing.module').then(m => m.LandingModule)},
   {path: 'legal', loadChildren: () => import('./pages/landing/landing.module').then(m => m.LandingModule)},
   {
-    path: '**',
+    path: 'login',
     loadChildren: () => import('./pages/not-found/not-found.module').then(m => m.NotFoundPageModule),
   },
 ];

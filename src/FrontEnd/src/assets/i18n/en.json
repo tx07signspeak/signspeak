@@ -7,11 +7,11 @@
     "shift": "Shift"
   },
   "translate": {
-    "title": "Sign Translate",
+    "title": "SignSpeak - AI Powered ASL Translator",
     "language-selector": {
       "detected": "{{lang}} - Detected",
       "more": "More Languages",
-      "detect": "Detect language"
+      "detect": " "
     },
     "description": "Effortless Real-Time Sign Language Translation. Translate Sign Language instantly on desktop and mobile.",
     "input": {
@@ -22,7 +22,7 @@
     "swapLanguages": "Swap languages",
     "spoken-to-signed": {
       "text": "Spoken Language Text",
-      "placeholder": "Enter Text",
+      "placeholder": " Enter Text Here",
       "actions": {
         "download": "Download Translation",
         "copy": "Copy Translation",

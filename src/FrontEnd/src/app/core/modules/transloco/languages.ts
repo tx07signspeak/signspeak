@@ -14,7 +14,7 @@ export const SITE_LANGUAGES = [
   {key: 'da', value: 'Dansk'},
   {key: 'de', value: 'Deutsch'},
   {key: 'et', value: 'Eesti'},
-  {key: 'en', value: 'English'},
+  {key: 'en', value: 'Text/Voice to ASL'},
   {key: 'en-GB', value: 'English (United Kingdom)'},
   {key: 'es', value: 'Español'},
   {key: 'es-419', value: 'Español (Latinoamérica)'},

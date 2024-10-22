@@ -58,9 +58,9 @@ ion-textarea#mobile {
     /* Address strange height on iOS */
     min-height: initial;
 
-    background-color: white;
+    background-color: rgb(200, 27, 27);
     @media (prefers-color-scheme: dark) {
-      background-color: #202124;
+      background-color: #e9ff33;
     }
   }
 }
