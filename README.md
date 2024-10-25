@@ -1,8 +1,6 @@
 "# signspeak" 
 
-@misc{moryossef2023signmt,
-    title={sign.mt: Effortless Real-Time Sign Language Translation},
-    author={Moryossef, Amit},
-    howpublished={\url{https://sign.mt/}},
-    year={2023}
-}
+# Reference
+
+Kazuhito Takahashi https://github.com/Kazuhito00/hand-gesture-recognition-using-mediapipe
+Amit Moryossef https://github.com/sign/translate
