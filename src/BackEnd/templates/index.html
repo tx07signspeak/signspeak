@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>SignSpeak - AI Powered ASL Translator</title>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
             var socket = io();  // Initialize a new socket connection
@@ -20,6 +21,9 @@
                 document.body.appendChild(p);
             });
         });
+        //const model = tf.loadLayersModel('../model/model.json');
+        //console.log('Model loaded successfully:', model)
+        // Use the model for predictions
     </script>
     <style>
         img {
@@ -34,6 +38,36 @@
     </style>
 </head>
 <body>
-    
+    <h1>TensorFlow.js Model Test</h1>
+    <video id="video" autoplay></video>
+    <br />
+    <button id="startBtn">Open Webcam</button>
+    <script>
+        async function loadModel() {
+            const model = await tf.loadLayersModel('model.json');
+            console.log('Model loaded successfully:', model);
+            // Optionally, run a prediction with dummy data
+            //const input = tf.zeros([1, ...model.inputs[0].shape.slice(1)]);
+            //const prediction = model.predict(input);
+            //prediction.print();
+        }
+        loadModel();
+        const videoElement = document.getElementById('video');
+        const startButton = document.getElementById('startBtn');
+
+        startButton.addEventListener('click', () => {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then((stream) => {
+                        videoElement.srcObject = stream;
+                    })
+                    .catch((error) => {
+                        console.error("Error accessing webcam: ", error);
+                    });
+            } else {
+                console.log("getUserMedia not supported on your browser!");
+            }
+        });
+    </script>
 </body>
 </html>
