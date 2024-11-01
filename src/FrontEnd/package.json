@@ -78,7 +78,7 @@
     "@sign-mt/i18n": "git://github.com/sign/i18n.git",
     "@sutton-signwriting/font-ttf": "1.5.2",
     "@sutton-signwriting/sgnw-components": "1.1.0",
-    "@tensorflow/tfjs": "4.21.0",
+    "@tensorflow/tfjs": "^4.21.0",
     "@tensorflow/tfjs-backend-wasm": "4.21.0",
     "@tensorflow/tfjs-backend-webgl": "4.21.0",
     "@tensorflow/tfjs-backend-webgpu": "4.21.0",

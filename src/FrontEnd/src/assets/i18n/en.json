@@ -123,9 +123,9 @@
   "video": {
     "errors": {
       "starting": "Camera starting",
-      "turnedOff": "Live Video Feed",
-      "notConnected": "Live Video Feed",
-      "permissionDenied": "Live Video Feed"
+      "turnedOff": "Camera turned off",
+      "notConnected": "Camera not connected",
+      "permissionDenied": "Camera permission denied"
     },
     "controls": {
       "receiveVideo": {
@@ -135,7 +135,7 @@
     }
   },
   "pose": {
-    "loading": "Live Video Feed"
+    "loading": "Loading Pose Estimation..."
   },
   "language-selector": {
     "label": "Change language or region"

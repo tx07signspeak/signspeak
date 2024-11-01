@@ -62,14 +62,14 @@ export class VideoComponent extends BaseComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.setCamera();
-    this.setStats();
-    this.trackPose();
+    // this.setStats();
+    // this.trackPose();
 
     this.canvasCtx = this.canvasEl.nativeElement.getContext('2d');
-    this.preloadSignWritingFont();
+    // this.preloadSignWritingFont();
     this.drawChanges();
 
-    this.preloadPoseEstimationModel();
+    // this.preloadPoseEstimationModel();
     this.videoEl.nativeElement.addEventListener('loadeddata', this.appLoop.bind(this));
     this.videoEl.nativeElement.addEventListener('ended', () => (this.videoEnded = true));
 
@@ -196,15 +196,15 @@ export class VideoComponent extends BaseComponent implements AfterViewInit {
               ctx.fillRect(0, 0, canvas.width, canvas.height);
             }
 
-            // Draw pose
-            if (settingsState.drawPose) {
-              this.poseService.draw(poseState.pose, ctx);
-            }
+            // // Draw pose
+            // if (settingsState.drawPose) {
+            //   this.poseService.draw(poseState.pose, ctx);
+            // }
 
-            // Draw Sign Writing
-            if (settingsState.drawSignWriting) {
-              this.signWritingService.draw(signWritingState, ctx);
-            }
+            // // Draw Sign Writing
+            // if (settingsState.drawSignWriting) {
+            //   this.signWritingService.draw(signWritingState, ctx);
+            // }
           }
         }),
         takeUntil(this.ngUnsubscribe)

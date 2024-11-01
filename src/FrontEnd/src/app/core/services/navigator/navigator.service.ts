@@ -14,11 +14,11 @@ export class NavigatorService {
       if (e.message.includes('Permission denied')) {
         throw new Error('permissionDenied');
       } else {
-        throw new Error('Live Video Feed');
+        throw new Error('notConnected');
       }
     }
     if (!camera) {
-      throw new Error('Live Video Feed');
+      throw new Error('notConnected');
     }
     return camera;
   }
