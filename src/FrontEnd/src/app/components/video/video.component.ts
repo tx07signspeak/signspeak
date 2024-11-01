@@ -196,10 +196,10 @@ export class VideoComponent extends BaseComponent implements AfterViewInit {
               ctx.fillRect(0, 0, canvas.width, canvas.height);
             }
 
-            // // Draw pose
-            // if (settingsState.drawPose) {
-            //   this.poseService.draw(poseState.pose, ctx);
-            // }
+            // Draw pose
+            if (settingsState.drawPose) {
+              this.poseService.draw(poseState.pose, ctx);
+            }
 
             // // Draw Sign Writing
             // if (settingsState.drawSignWriting) {
