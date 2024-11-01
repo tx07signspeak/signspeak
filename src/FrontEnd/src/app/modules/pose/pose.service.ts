@@ -3,6 +3,7 @@ import * as drawing from '@mediapipe/drawing_utils/drawing_utils.js';
 import {EMPTY_LANDMARK, EstimatedPose, PoseLandmark} from './pose.state';
 import {GoogleAnalyticsService} from '../../core/modules/google-analytics/google-analytics.service';
 import {MediapipeHolisticService} from '../../core/services/holistic.service';
+import * as tf from '@tensorflow/tfjs';
 
 const IGNORED_BODY_LANDMARKS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16, 17, 18, 19, 20, 21, 22];
 
@@ -11,7 +12,9 @@ const IGNORED_BODY_LANDMARKS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16, 17, 18
 })
 export class PoseService {
   model?: any;
-
+  private DetectModel: tf.GraphModel | null = null;
+  private isModelLoading = false;
+  private modelLoaded: boolean = false;
   // loadPromise must be static, in case multiple PoseService instances are created (during testing)
   static loadPromise: Promise<any>;
 
@@ -74,7 +77,7 @@ export class PoseService {
 
   async predict(video: HTMLVideoElement | HTMLImageElement): Promise<void> {
     await this.load();
-
+    
     const frameType = this.isFirstFrame ? 'first-frame' : 'frame';
     await this.ga.trace('pose', frameType, () => {
       this.isFirstFrame = false;
@@ -209,5 +212,58 @@ export class PoseService {
     }
 
     return landmarks;
+  }
+
+  private async processVideoFrame() {
+    // This is a placeholder for the actual processing
+    // console.log('Processing frame:', imageData.width, 'x', imageData.height);
+    // Convert the ImageData to a TensorFlow tensor
+    const throttledProcessFrame = this.throttle((imageData) => {
+      this.processVideoFrame();
+    }, 100); // Adjust the delay (1000 ms = 1 second) as needed
+    if (!this.modelLoaded) {
+      console.error('Model not loaded yet!');
+      return;
+    }
+    // 4. TODO - Make Detections
+    const video = document.querySelector('video');
+    if (video) {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      let imageData = null;
+      if (canvas.width > 0 && canvas.height > 0) {
+        imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        // Process the frame here
+        throttledProcessFrame(imageData);
+      }
+      const img = tf.browser.fromPixels(imageData);
+      const resized = tf.image.resizeBilinear(img, [640, 480]);
+      const casted = resized.cast('int32');
+      const expanded = casted.expandDims(0);
+      const obj = this.DetectModel.executeAsync(expanded);
+      console.log(obj);
+      // Check if obj is an array and has at least 3 elements (index 2)
+      // if (Array.isArray(obj) && obj.length > 2) {
+      //   const classes = obj[2].array();
+      //   console.log(classes);
+      // } else {
+      //   console.error('Unexpected model output format or missing index [2]');
+      // }
+    }
+ 
+  }
+
+  private throttle(func, delay) {
+    let lastCall = 0;
+    return function (...args) {
+      const now = new Date().getTime();
+      if (now - lastCall >= delay) {
+        lastCall = now;
+        func(...args);
+      }
+    };
   }
 }
