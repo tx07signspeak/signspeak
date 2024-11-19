@@ -157,18 +157,18 @@ export class PoseService {
   }
 
   draw(pose: EstimatedPose, ctx: CanvasRenderingContext2D): void {
-    // if (pose.poseLandmarks) {
-    //   this.drawBody(pose.poseLandmarks, ctx);
-    //   this.drawElbowHandsConnection(pose, ctx);
-    // }
+    if (pose.poseLandmarks) {
+      this.drawBody(pose.poseLandmarks, ctx);
+      this.drawElbowHandsConnection(pose, ctx);
+    }
 
-    // if (pose.leftHandLandmarks) {
-    //   this.drawHand(pose.leftHandLandmarks, ctx, '#CC0000', '#FF0000', '#00FF00');
-    // }
+    if (pose.leftHandLandmarks) {
+      this.drawHand(pose.leftHandLandmarks, ctx, '#CC0000', '#FF0000', '#00FF00');
+    }
 
-    // if (pose.rightHandLandmarks) {
-    //   this.drawHand(pose.rightHandLandmarks, ctx, '#00CC00', '#00FF00', '#FF0000');
-    // }
+    if (pose.rightHandLandmarks) {
+      this.drawHand(pose.rightHandLandmarks, ctx, '#00CC00', '#00FF00', '#FF0000');
+    }
 
     if (pose.faceLandmarks) {
       this.drawFace(pose.faceLandmarks, ctx);
