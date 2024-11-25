@@ -171,13 +171,13 @@ def Real_Time():
                     # Draw landmarks
                     mpfs.draw_styled_landmarks(image, results)
                     if num == 0: 
-                            cv2.putText(image, 'Start Collecting', (120,200), 
+                            cv2.putText(image, 'Start Signing', (120,200), 
                                     cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255, 0), 4, cv2.LINE_AA)
                             # Show to screen
                             cv2.imshow('Camera Feed', image)
                             cv2.waitKey(2000)
                     else: 
-                            cv2.putText(image, 'Collecting frames', (15,12), 
+                            cv2.putText(image, 'Interpreting...', (15,12), 
                                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
                             # Show to screen
                             cv2.imshow('Camera Feed', image)
@@ -192,8 +192,8 @@ def Real_Time():
                         print(np.argmax(res))
                         if res[np.argmax(res)] > threshold: 
                             print(actions[np.argmax(res)])
-                            cap.release()
-                            cv2.destroyAllWindows()
+                            # cap.release()
+                            # cv2.destroyAllWindows()
                 # break      
                 # Break gracefully
                 if cv2.waitKey(10) & 0xFF == ord('q'):
